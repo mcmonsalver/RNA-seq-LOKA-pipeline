@@ -46,8 +46,75 @@ This pipeline processes RNA-seq data from raw FASTQ files through quality contro
 - 32+ GB RAM
 - 100+ GB disk space
 
-### 1. Launch Codespace
+### Option 1: GitHub Codespaces (Recommended - Zero Setup!)
 
-1. Go to the [repository](https://github.com/mcmonsalver/RNA-seq-LOKA-pipeline)
+**Fastest way to get started** - everything is pre-configured:
+
+1. Go to [https://github.com/mcmonsalver/RNA-seq-LOKA-pipeline](https://github.com/mcmonsalver/RNA-seq-LOKA-pipeline)
 2. Click **Code** → **Codespaces** → **Create codespace on main**
-3. Wait 2-3 minutes for environment setup
+3. Wait 2-3 minutes while the environment sets up automatically
+
+The `.devcontainer` configuration automatically installs:
+- ✅ Nextflow (latest version)
+- ✅ Java 17 (Nextflow dependency)
+- ✅ Docker-in-Docker (for containers)
+- ✅ Helpful VS Code extensions
+
+**Skip to [Quick Start](#quick-start) section - you're ready to run!**
+
+---
+
+### Option 2: Local Installation (Manual Setup)
+
+For running on your own machine or HPC cluster:
+
+#### 1. Install Nextflow
+
+```bash
+# Download Nextflow
+curl -s https://get.nextflow.io | bash
+
+# Make it executable
+chmod +x nextflow
+
+# Move to a directory in your PATH
+sudo mv nextflow /usr/local/bin/
+
+# Verify installation
+nextflow -version
+```
+
+**Without sudo access (HPC/shared systems):**
+```bash
+curl -s https://get.nextflow.io | bash
+mkdir -p ~/bin
+mv nextflow ~/bin/
+echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+nextflow -version
+```
+
+#### 2. Install Docker
+
+**Ubuntu/Debian:**
+```bash
+sudo apt-get update
+sudo apt-get install -y docker.io
+sudo usermod -aG docker $USER
+# Log out and back in for group changes to take effect
+```
+
+**macOS:**
+```bash
+brew install --cask docker
+```
+
+**For other systems:** See https://docs.docker.com/get-docker/
+
+#### 3. Clone the Repository
+
+```bash
+git clone https://github.com/mcmonsalver/RNA-seq-LOKA-pipeline.git
+cd RNA-seq-LOKA-pipeline
+```
+
