@@ -1,0 +1,5 @@
+sample;condition;fastq_1;fastq_2
+SRR17382349;cold;data/SRR17382349_1.fastq.gz;data/SRR17382349_2.fastq.gz
+SRR17382370;control;data/SRR17382370_1.fastq.gz;data/SRR17382370_2.fastq.gz
+SRR17382366;cold;data/SRR17382366_1.fastq.gz;data/SRR17382366_2.fastq.gz
+SRR17382351;control;data/SRR17382351_1.fastq.gz;data/SRR17382351_2.fastq.gz
