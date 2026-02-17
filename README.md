@@ -65,7 +65,6 @@ The `.devcontainer` configuration automatically installs:
 **Skip to [Quick Start](#quick-start) section - you're ready to run!**
 
 ---
-## Installation
 
 ### Option 2: Local Installation (Manual Setup)
 
