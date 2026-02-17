@@ -1,0 +1,18 @@
+DESeq2 Analysis - Arabidopsis Cold Stress
+==========================================
+
+Samples:
+            condition
+SRR17382349      cold
+SRR17382351   control
+SRR17382366      cold
+SRR17382370   control
+
+Condition levels: cold control 
+Samples per condition:
+
+   cold control 
+      2       2 
+
+NOTE: With n=1 per condition, statistical power is limited.
+Results are for pipeline demonstration purposes.
