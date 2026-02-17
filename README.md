@@ -358,7 +358,7 @@ Columns:
 The pipeline is organized into modular processes:
 
 ```
-main.nf                 # Main workflow orchestration
+├── main.nf                 # Main workflow orchestration
 ├── modules/
 │   ├── fetch_fastq.nf          # FASTQ file publishing
 │   ├── fetch_SRA.nf            # SRA download
