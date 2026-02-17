@@ -266,3 +266,177 @@ process {
 nextflow run main.nf -profile aws
 ```
 
+## Output Structure
+
+After pipeline completion, results are organized in the `results/` directory:
+```
+results/
+├── raw/
+│   ├── fastq/                  # Published raw FASTQ files
+│   └── multiqc/                # MultiQC report for raw reads
+│       ├── multiqc_report.html
+│       └── multiqc_data/
+├── trimmed/
+│   ├── fastq/                  # Trimmed FASTQ files
+│   ├── fastp/                  # fastp trimming reports
+│   │   ├── *_fastp.html
+│   │   └── *_fastp.json
+│   └── multiqc/                # MultiQC report for trimmed reads
+│       ├── multiqc_report.html
+│       └── multiqc_data/
+├── quant/
+│   ├── reference_transcriptome/   # Reference transcriptome FASTA
+│   ├── SRR17382349_quant/         # Per-sample Salmon quantification
+│   ├── SRR17382351_quant/
+│   ├── SRR17382366_quant/
+│   └── SRR17382370_quant/
+├── count/
+│   └── merged_counts.tsv       # Gene × Sample count matrix                
+└── DESeq2/                     # Differential expression analysis
+    ├── deg_results.csv         # Differential expression results
+    ├── normalized_counts.csv   # Normalized count matrix
+    ├── pca_plot.pdf            # PCA visualization
+    ├── volcano_plot.pdf        # Volcano plot
+    └── sample_info.txt         # Analysis metadata
+```
+## Output Files Explained
+
+### Primary Analysis Outputs
+
+**FastQC Reports (`results/fastqc/`):**
+- Quality metrics for raw and trimmed reads
+- Per-base quality scores, GC content, adapter content
+
+**Trimming Reports (`results/fastp/`):**
+- Adapter removal statistics
+- Quality filtering metrics
+- Before/after comparison
+
+**MultiQC Reports (`results/multiqc/`):**
+- Aggregated quality metrics across all samples
+- Interactive HTML reports
+
+### Secondary Analysis Outputs
+
+**Salmon Quantification (`results/salmon/`):**
+- `quant.sf`: Transcript-level abundance estimates
+- `lib_format_counts.json`: Library type detection
+- Mapping statistics
+
+**Merged Counts (`results/counts/merged_counts.tsv`):**
+
+Example format:
+```tsv
+gene_id      SRR17382349  SRR17382351  SRR17382366  SRR17382370
+AT1G01010    425.959      376.26       512.34       389.12
+AT1G01020    57.999       111.001      89.45        102.56
+```
+
+**DESeq2 Results (`results/differential_expression/deg_results.csv`):**
+
+Columns:
+- `baseMean`: Average normalized counts across all samples
+- `log2FoldChange`: Log2 fold change (condition vs reference)
+  - Positive = upregulated in treatment
+  - Negative = downregulated in treatment
+- `lfcSE`: Standard error of log2FoldChange
+- `stat`: Wald test statistic
+- `pvalue`: Raw p-value
+- `padj`: Benjamini-Hochberg adjusted p-value
+  - **Significant genes: padj < 0.05**
+
+**Visualizations:**
+- `pca_plot.pdf`: Principal component analysis showing sample clustering
+- `volcano_plot.pdf`: Scatter plot of fold change vs. significance
+  - Red: Significantly upregulated (padj < 0.05, log2FC > 1)
+  - Blue: Significantly downregulated (padj < 0.05, log2FC < -1)
+
+## Pipeline Architecture
+
+The pipeline is organized into modular processes:
+
+```
+main.nf                 # Main workflow orchestration
+├── modules/
+│   ├── fetch_fastq.nf          # FASTQ file publishing
+│   ├── fetch_SRA.nf            # SRA download
+│   ├── fastqc.nf               # Quality control
+│   ├── trim_fastp.nf           # Adapter trimming
+│   ├── multiQC.nf              # Report aggregation
+│   ├── download_reference.nf   # Reference download
+│   ├── download_gtf.nf         # GTF annotation download
+│   ├── ref_file.nf             # Reference publishing
+│   ├── salmon_index.nf         # Transcriptome indexing
+│   ├── salmon_quant.nf         # Quantification
+│   ├── salmon_merge_counts.nf  # Count aggregation
+│   └── deseq2.nf               # Differential expression
+└── nextflow.config     # Configuration and parameters
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**1. Docker permission denied:**
+```bash
+sudo usermod -aG docker $USER
+# Log out and back in
+```
+
+**2. Out of disk space:**
+```bash
+# Clean Nextflow cache
+nextflow clean -f
+
+# Remove old work directories
+rm -rf work/
+```
+
+**3. Network timeout when pulling containers:**
+```bash
+# Retry the command
+nextflow run main.nf -resume
+
+# Or pre-pull containers
+docker pull community.wave.seqera.io/library/fastqc:0.12.1--af7a5314d5015c29
+docker pull community.wave.seqera.io/library/fastp:1.1.0--08aa7c5662a30d57
+# ... etc
+```
+
+**4. DESeq2 requires replicates:**
+
+DESeq2 needs ≥2 biological replicates per condition. Ensure your metadata has multiple samples per condition:
+```csv
+sample;condition;fastq_1;fastq_2
+sample1;treatment;...;...
+sample2;treatment;...;...
+sample3;control;...;...
+sample4;control;...;...
+```
+
+## Dataset Information
+
+### Demo Dataset
+
+The included demo uses Arabidopsis thaliana RNA-seq data from a cold stress experiment:
+
+- **Study:** SRP353395
+- **Organism:** Arabidopsis thaliana (Columbia-0)
+- **Tissue:** Roots
+- **Conditions:** 
+  - Cold stress (4°C, 24 hours): SRR17382349, SRR17382366
+  - Control (22°C): SRR17382351, SRR17382370
+- **Sequencing:** Illumina NovaSeq 6000, paired-end, 150bp
+- **Reference:** Ensembl Plants Release 62 (TAIR10)
+
+## Known Limitations
+
+1. **Disk Space:** Large datasets (>20 samples) require significant storage for intermediate files
+2. **Network:** SRA downloads and container pulling require stable internet connection
+3. **Statistical Power:** Demo dataset (n=2 per condition) has limited power for detecting subtle gene expression changes
+
+---
+
+**Pipeline Version:** 1.0.0  
+**Last Updated:** February 2026  
+**Nextflow DSL Version:** 2
