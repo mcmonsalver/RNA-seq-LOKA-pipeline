@@ -46,6 +46,8 @@ This pipeline processes RNA-seq data from raw FASTQ files through quality contro
 - 32+ GB RAM
 - 100+ GB disk space
 
+## Installation
+
 ### Option 1: GitHub Codespaces (Recommended - Zero Setup!)
 
 **Fastest way to get started** - everything is pre-configured:
