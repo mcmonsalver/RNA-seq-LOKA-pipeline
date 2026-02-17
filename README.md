@@ -63,6 +63,7 @@ The `.devcontainer` configuration automatically installs:
 **Skip to [Quick Start](#quick-start) section - you're ready to run!**
 
 ---
+## Installation
 
 ### Option 2: Local Installation (Manual Setup)
 
@@ -116,5 +117,152 @@ brew install --cask docker
 ```bash
 git clone https://github.com/mcmonsalver/RNA-seq-LOKA-pipeline.git
 cd RNA-seq-LOKA-pipeline
+```
+
+## Quick Start
+
+### Running the Demo Dataset
+
+The pipeline includes a metadata file for 4 Arabidopsis thaliana samples (2 cold stress, 2 control). You just need to download the FASTQ files:
+
+#### 1. Download Demo Data
+
+```bash
+# Go the the data directory
+cd data
+
+# Download the 4 demo samples (paired-end) (~2-3 GB total)
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR173/049/SRR17382349/SRR17382349_1.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR173/049/SRR17382349/SRR17382349_2.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR173/051/SRR17382351/SRR17382351_1.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR173/051/SRR17382351/SRR17382351_2.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR173/066/SRR17382366/SRR17382366_1.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR173/066/SRR17382366/SRR17382366_2.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR173/070/SRR17382370/SRR17382370_1.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR173/070/SRR17382370/SRR17382370_2.fastq.gz
+
+# Return to main directory
+cd ..
+```
+
+#### 2. Run the Pipeline
+
+```bash
+# Run with default settings (uses local_metadataDEMO.csv)
+nextflow run main.nf
+```
+
+## Input Data
+
+The repository includes two metadata files in the `data/` directory:
+
+### 1. `local_metadataDEMO.csv` (Default - Local FASTQ Files)
+
+Pre-configured metadata for the 4-sample demo. Points to local FASTQ files you download with wget:
+
+```csv
+sample;condition;fastq_1;fastq_2
+SRR17382349;cold;data/SRR17382349_1.fastq.gz;data/SRR17382349_2.fastq.gz
+SRR17382351;control;data/SRR17382351_1.fastq.gz;data/SRR17382351_2.fastq.gz
+SRR17382366;cold;data/SRR17382366_1.fastq.gz;data/SRR17382366_2.fastq.gz
+SRR17382370;control;data/SRR17382370_1.fastq.gz;data/SRR17382370_2.fastq.gz
+```
+
+**This is used by default** - no configuration needed after downloading files.
+
+### 2. `sra_metadata.csv` (Alternative - Automatic SRA Download)
+
+Contains all samples from the complete experiment. Use this to automatically download data from SRA:
+
+```csv
+Run;treatment;LibraryLayout
+SRR17382349;cold;PAIRED
+SRR17382351;control;PAIRED
+SRR17382366;cold;PAIRED
+SRR17382370;control;PAIRED
+...additional samples...
+```
+
+**To use SRA mode**:
+
+```bash
+nextflow run main.nf --input_mode sra
+```
+
+The pipeline will automatically download FASTQ files from SRA.
+
+---
+
+### Creating Your Own Metadata
+
+#### For Local FASTQ Files (Paired-End)
+
+Create a semicolon-separated CSV:
+
+```csv
+sample;condition;fastq_1;fastq_2
+sample1;treatment;data/sample1_R1.fastq.gz;data/sample1_R2.fastq.gz
+sample2;treatment;data/sample2_R1.fastq.gz;data/sample2_R2.fastq.gz
+sample3;control;data/sample3_R1.fastq.gz;data/sample3_R2.fastq.gz
+sample4;control;data/sample4_R1.fastq.gz;data/sample4_R2.fastq.gz
+```
+
+**Requirements:**
+- ≥2 samples per condition (for DESeq2)
+- Semicolon-separated (not comma)
+- Column names must match exactly: `sample;condition;fastq_1;fastq_2`
+
+#### For Local FASTQ Files (Single-End)
+
+```csv
+sample;condition;fastq
+sample1;treatment;data/sample1.fastq.gz
+sample2;control;data/sample2.fastq.gz
+```
+
+Update `nextflow.config`:
+```groovy
+params {
+    PE_or_SE = 'SE'  // Change from 'PE' to 'SE'
+    samplesheet_local = 'data/your_metadata.csv'
+}
+```
+## Configuration
+
+### Basic Parameters
+
+Edit `nextflow.config` to customize the pipeline:
+
+```groovy
+params {
+    // Input mode: 'local' or 'sra'
+    input_mode = 'local'
+    
+    // For local FASTQ files
+    PE_or_SE = 'PE'  // 'PE' for paired-end, 'SE' for single-end
+    samplesheet_local = 'data/local_metadataDEMO.csv'
+    
+    // For SRA downloads
+    samplesheet_sra = 'data/sra_metadata.csv'
+    
+    // Reference genome/transcriptome
+    reference_fasta_link = 'https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/fasta/arabidopsis_thaliana/cdna/Arabidopsis_thaliana.TAIR10.cdna.all.fa.gz'
+    reference_gtf_link = 'https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/gtf/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.62.gtf.gz'
+}
+```
+### Resource Configuration
+
+**Local execution (default):**
+```groovy
+process {
+    executor = 'local'
+    cpus = 2
+    memory = '4 GB'
+}
+```
+
+**AWS Batch execution:**
+```bash
+nextflow run main.nf -profile aws
 ```
 

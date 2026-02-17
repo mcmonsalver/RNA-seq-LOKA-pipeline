@@ -117,24 +117,19 @@ workflow {
 
     publish:
     //RAW
-    //fastq_files = FETCH_FASTQ.out 
-    //report1_QC = FASTQC_RAW.out.html
-    //report2_QC = FASTQC_RAW.out.zip
-    //multiQC_html = MULTIQC_RAW.out.html
-    //multiQC_data = MULTIQC_RAW.out.data
+    fastq_files = FETCH_FASTQ.out 
+    multiQC_html = MULTIQC_RAW.out.html
+    multiQC_data = MULTIQC_RAW.out.data
     
     //TRIMMING 
-    //trimmed_reads = TRIM_FASTP.out.trimmed_reads
-    //report1_QC_trimmed = TRIM_FASTP.out.html
-    //report2_QC_trimmed = TRIM_FASTP.out.json
-    //report1_QC_t = FASTQC_TRIMMED.out.html
-    //report2_QC_t = FASTQC_TRIMMED.out.zip
-    //multiQC_html_t = MULTIQC_TRIMMED.out.html
-    //multiQC_data_t = MULTIQC_TRIMMED.out.data
+    trimmed_reads = TRIM_FASTP.out.trimmed_reads
+    report1_QC_trimmed = TRIM_FASTP.out.html
+    report2_QC_trimmed = TRIM_FASTP.out.json
+    multiQC_html_t = MULTIQC_TRIMMED.out.html
+    multiQC_data_t = MULTIQC_TRIMMED.out.data
     
     // QUANTIFICATION
-    //reference_fasta = REF_FILE.out
-    //salmon_index = SALMON_INDEX.out
+    reference_fasta = REF_FILE.out
     salmon_quant = SALMON_QUANT.out.quant
 
     //COUNTS
@@ -151,57 +146,37 @@ workflow {
 
 output {
     //RAW
-    /*
     fastq_files {
         path 'raw/fastq'
     }
     
-    report1_QC {
-        path 'raw/qc/fastQC'
-    }
-    
-    report2_QC {
-        path 'raw/qc/fastQC'
-    }
-    */
-    /*
     multiQC_html {
-        path 'raw/qc/multiqc'
+        path 'raw/multiqc'
     }
     
     multiQC_data {
-        path 'raw/qc/multiqc'
+        path 'raw/multiqc'
     }
-    */
+
     //TRIMMED
-    /*
     trimmed_reads {
         path 'trimmed/fastq'
     }
     
     report1_QC_trimmed {
-        path 'trimmed/qc/fastp'
+        path 'trimmed/fastp'
     }
 
     report2_QC_trimmed {
-        path 'trimmed/qc/fastp'
-    }
-
-    report1_QC_t {
-        path 'trimmed/qc/fastQC'
-    }
-
-    report2_QC_t {
-        path 'trimmed/qc/fastQC'
+        path 'trimmed/fastp'
     }
     
     multiQC_html_t {
-        path 'trimmed/qc/multiqc'
+        path 'trimmed/multiqc'
     }
-    */
-    /*
+
     multiQC_data_t {
-        path 'trimmed/qc/multiqc'
+        path 'trimmed/multiqc'
     }
     
     //QUANTIFICATION
@@ -209,10 +184,6 @@ output {
         path 'quant/reference_transcriptome'
     }
 
-    salmon_index {
-        path 'quant/salmon_index'
-    }
-    */
     salmon_quant {
         path 'quant'
     }
