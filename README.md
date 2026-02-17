@@ -353,6 +353,21 @@ Columns:
   - Red: Significantly upregulated (padj < 0.05, log2FC > 1)
   - Blue: Significantly downregulated (padj < 0.05, log2FC < -1)
 
+## Example Outputs
+
+The repository includes example DESeq2 outputs from a complete pipeline run in `example_results_DESeq2/`:
+```
+example_results_DESeq2/                     
+    ├── deg_results.csv         # significant genes (padj < 0.05)
+    ├── normalized_counts.csv   # Normalized counts for all genes
+    ├── pca_plot.pdf            # Shows clear separation of cold vs control
+    ├── volcano_plot.pdf        # Visualization of up / down genes
+    └── sample_info.txt         # Analysis metadata
+```
+
+**View these files to see expected DESeq2 outputs without running the full pipeline.**
+
+
 ## Pipeline Architecture
 
 The pipeline is organized into modular processes:
